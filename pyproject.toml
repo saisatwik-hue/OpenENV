@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "email-triage-response-peak"
+version = "1.0.0"
+description = "Real-world OpenEnv environment for enterprise email management. 50 emails, 3 tasks, shaped rewards."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.20.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.24.0",
+    "python-multipart>=0.0.9",
+    "PyYAML>=6.0",
+    "openenv-core>=0.2.0",
+]
+
+[project.scripts]
+server = "server.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*", "server*", "scripts*"]

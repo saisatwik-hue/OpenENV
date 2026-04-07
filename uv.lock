@@ -1,0 +1,27 @@
+version = 1
+requires-python = ">=3.9"
+
+[[package]]
+name = "email-triage-response-peak"
+version = "1.0.0"
+source = { editable = "." }
+dependencies = [
+  { name = "fastapi" },
+  { name = "httpx" },
+  { name = "openenv-core" },
+  { name = "pydantic" },
+  { name = "python-multipart" },
+  { name = "pyyaml" },
+  { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.metadata]
+requires-dist = [
+  { name = "fastapi", specifier = ">=0.100.0" },
+  { name = "httpx", specifier = ">=0.24.0" },
+  { name = "openenv-core", specifier = ">=0.2.0" },
+  { name = "pydantic", specifier = ">=2.0.0" },
+  { name = "python-multipart", specifier = ">=0.0.9" },
+  { name = "PyYAML", specifier = ">=6.0" },
+  { name = "uvicorn[standard]", specifier = ">=0.20.0" },
+]

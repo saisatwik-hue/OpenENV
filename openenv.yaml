@@ -1,0 +1,115 @@
+name: email-triage-response-peak
+version: "1.0.0"
+description: "Real-world OpenEnv environment for enterprise email management. 50 emails across 6 categories, 3 tasks of progressive difficulty (easy/medium/hard), dense shaped rewards, synonym-aware grading, and Kendall tau prioritization scoring."
+
+tasks:
+  - id: task_1
+    name: "Email Triage"
+    difficulty: easy
+    max_steps: 25
+    pass_threshold: 0.75
+    description: "Classify 20 emails by category (urgent/normal/low/spam/internal/external), assign priority score (0-1), and take correct action. Graded: category accuracy (40%), priority accuracy (30%), action correctness (30%)."
+
+  - id: task_2
+    name: "Response Drafting"
+    difficulty: medium
+    max_steps: 25
+    pass_threshold: 0.78
+    description: "Draft professional responses and escalations for 15 emails. Graded: action type (20%), synonym-aware keyword coverage (40%), completeness (20%), tone appropriateness (20%)."
+
+  - id: task_3
+    name: "Inbox Zero Sprint"
+    difficulty: hard
+    max_steps: 55
+    pass_threshold: 0.68
+    description: "Process all 50 emails with correct prioritization under step budget. Graded: quality (30%), coverage (25%), prioritization (20%), critical handling (15%), step efficiency (10%). Missing critical emails (priority>=0.88) penalizes heavily."
+
+observation_space:
+  type: object
+  properties:
+    step:
+      type: integer
+      description: "Current step number in episode"
+    inbox:
+      type: array
+      description: "List of EmailSnapshot objects in inbox"
+    current_email:
+      type: object
+      description: "Next unprocessed email with full details"
+    current_email_body:
+      type: string
+      description: "Full body text of current email"
+    processed_count:
+      type: integer
+      description: "Number of emails acted on so far"
+    pending_count:
+      type: integer
+      description: "Number of emails awaiting action"
+    progress:
+      type: number
+      minimum: 0.0
+      maximum: 1.0
+      description: "Fraction of emails processed (0.0 to 1.0)"
+    cumulative_reward:
+      type: number
+      description: "Total reward accumulated this episode"
+    available_actions:
+      type: array
+      description: "List of valid action_type strings for current state"
+    task_description:
+      type: string
+      description: "Human-readable task objective"
+    task_id:
+      type: string
+      description: "Active task identifier"
+
+action_space:
+  type: object
+  required:
+    - action_type
+    - email_id
+  properties:
+    action_type:
+      type: string
+      enum:
+        - triage
+        - respond
+        - escalate
+        - archive
+        - flag
+        - compose
+        - skip
+      description: "Action to perform on the email"
+    email_id:
+      type: string
+      description: "ID of the email to act on (e.g. e001)"
+    category:
+      type: string
+      enum:
+        - urgent
+        - normal
+        - low
+        - spam
+        - internal
+        - external
+      description: "Email classification category (required for triage)"
+    priority_score:
+      type: number
+      minimum: 0.0
+      maximum: 1.0
+      description: "Agent's assessed urgency (0=lowest, 1=highest)"
+    response_text:
+      type: string
+      description: "Draft response body (required for respond/compose)"
+    escalate_to:
+      type: string
+      description: "Role/team to escalate to (required for escalate)"
+    reason:
+      type: string
+      description: "Optional reasoning for the action taken"
+
+reward:
+  type: shaped
+  minimum: -1.0
+  maximum: 1.0
+  description: "Dense per-step shaped reward. Correct critical escalation: +0.50. Good response: +0.10 to +0.40. Wrong category on urgent: -0.10 to -0.20. Archive critical email (priority>=0.88): -0.25. Duplicate action: -0.10."
